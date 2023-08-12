@@ -1,51 +1,53 @@
 import tkinter as tk
+from tkinter import ttk  # Import ttk for themed widgets
 from tabulate import tabulate
+
 
 onTour = []
 # Tout queue already full to make testing easier, same with timeOut queue
 tout = ["HEB", "ABC", "EFG", "GHI", "GHF", "IUY", "YRT", "NMB"] 
 timeOut = ["YUT"]
 
-def addRTG(name):
-    name = name.strip()
+def addRTG(code):
+    code = code.strip()
     if len(tout) < 8:
-        tout.append(name)
+        tout.append(code)
     else:
-        timeOut.append(name)
+        timeOut.append(code)
 
-def removeRTG(name):
-    if name in tout:
-        tout.remove(name)
-    elif name in timeOut:
-        timeOut.remove(name)
-    elif name in onTour:
+def removeRTG(code):
+    if code in tout:
+        tout.remove(code)
+    elif code in timeOut:
+        timeOut.remove(code)
+    elif code in onTour:
         print("You cannot remove RTG from roster when on tour.")
 
-def sendOnTour(name):
-    if name in tout:
-        if name == tout[0]:
-            onTour.append([name])
-            tout.remove(name)
+def sendOnTour(code):
+    if code in tout:
+        if code == tout[0]:
+            onTour.append([code])
+            tout.remove(code)
             
         if timeOut:
             tout.append(timeOut[0])
             del timeOut[0]
     else:
-        print("Name is not valid")
+        print("code is not valid")
 
-def returnFromTour(name):
-    name = name.strip()
+def returnFromTour(code):
+    code = code.strip()
     found = False
     
     for i in onTour:
-        if i[0] == name:
+        if i[0] == code:
             onTour.remove(i)
-            addRTG(name)
+            addRTG(code)
             found = True
             break
     
     if not found:
-        print(f"{name} is not on tour")
+        print(f"{code} is not on tour")
 
 def displayQueue():
     tout_table = [[num, rtg] for num, rtg in enumerate(tout, start=1)]
@@ -59,71 +61,75 @@ def displayQueue():
     queue_label.config(text=queue_text)
 
 def add_rtg_button_clicked():
-    rtg_name = add_rtg_entry.get()
-    addRTG(rtg_name)
+    rtg_code = add_rtg_entry.get()
+    addRTG(rtg_code)
     displayQueue()
 
 def send_on_tour_button_clicked():
-    rtg_name = send_on_tour_entry.get()
-    sendOnTour(rtg_name)
+    rtg_code = send_on_tour_entry.get()
+    sendOnTour(rtg_code)
     displayQueue()
 
 def return_from_tour_button_clicked():
-    rtg_name = return_from_tour_entry.get()
-    returnFromTour(rtg_name)
+    rtg_code = return_from_tour_entry.get()
+    returnFromTour(rtg_code)
+    displayQueue()
+
+def remove_rtg_button_clicked():
+    rtg_name = remove_rtg_entry.get()
+    removeRTG(rtg_name)
     displayQueue()
 
 root = tk.Tk()
 root.title("RTG Management System")
 
+# Centered title
 title_label = tk.Label(root, text="RTG Management System", font=("TkDefaultFont", 18, "bold"))
-title_label.pack(pady=10)
+title_label.grid(row=0, column=0, columnspan=4, pady=10)
 
-# Add empty space
-empty_label1 = tk.Label(root, text="", font=("TkDefaultFont", 14))
-empty_label1.pack()
-
+# Add RTG section
 add_rtg_label = tk.Label(root, text="Add RTG", font=("TkDefaultFont", 16, "bold"))
-add_rtg_label.pack()
+add_rtg_label.grid(row=1, column=0, columnspan=2)
 
 add_rtg_entry = tk.Entry(root)
-add_rtg_entry.pack()
+add_rtg_entry.grid(row=2, column=0, columnspan=2)
 
 add_rtg_button = tk.Button(root, text="Add RTG", font=("TkDefaultFont", 14), command=add_rtg_button_clicked)
-add_rtg_button.pack()
+add_rtg_button.grid(row=3, column=0, columnspan=2, pady=(0, 10))
 
-# Add empty space
-empty_label2 = tk.Label(root, text="", font=("TkDefaultFont", 14))
-empty_label2.pack()
-
+# Send on Tour section
 send_on_tour_label = tk.Label(root, text="Send RTG on Tour", font=("TkDefaultFont", 16, "bold"))
-send_on_tour_label.pack()
+send_on_tour_label.grid(row=1, column=2, columnspan=2)
 
 send_on_tour_entry = tk.Entry(root)
-send_on_tour_entry.pack()
+send_on_tour_entry.grid(row=2, column=2, columnspan=2)
 
 send_on_tour_button = tk.Button(root, text="Send On Tour", font=("TkDefaultFont", 14), command=send_on_tour_button_clicked)
-send_on_tour_button.pack()
+send_on_tour_button.grid(row=3, column=2, columnspan=2, pady=(0, 10))
 
-# Add empty space
-empty_label3 = tk.Label(root, text="", font=("TkDefaultFont", 14))
-empty_label3.pack()
-
+# Return from Tour section
 return_from_tour_label = tk.Label(root, text="Return RTG from Tour", font=("TkDefaultFont", 16, "bold"))
-return_from_tour_label.pack()
+return_from_tour_label.grid(row=4, column=0, columnspan=2)
 
 return_from_tour_entry = tk.Entry(root)
-return_from_tour_entry.pack()
+return_from_tour_entry.grid(row=5, column=0, columnspan=2)
 
 return_from_tour_button = tk.Button(root, text="Return From Tour", font=("TkDefaultFont", 14), command=return_from_tour_button_clicked)
-return_from_tour_button.pack()
+return_from_tour_button.grid(row=6, column=0, columnspan=2, pady=(0, 10))
 
-# Add empty space
-empty_label4 = tk.Label(root, text="", font=("TkDefaultFont", 14))
-empty_label4.pack()
+# Remove RTG section
+remove_rtg_label = tk.Label(root, text="Remove RTG", font=("TkDefaultFont", 16, "bold"))
+remove_rtg_label.grid(row=4, column=2, columnspan=2)
 
+remove_rtg_entry = tk.Entry(root)
+remove_rtg_entry.grid(row=5, column=2, columnspan=2)
+
+remove_rtg_button = tk.Button(root, text="Remove RTG", font=("TkDefaultFont", 14), command=remove_rtg_button_clicked)
+remove_rtg_button.grid(row=6, column=2, columnspan=2, pady=(0, 10))
+
+# Queue display
 queue_label = tk.Label(root, text="")
-queue_label.pack()
+queue_label.grid(row=7, column=0, columnspan=4)
 
 displayQueue()  # Initial display
 
