@@ -75,32 +75,51 @@ def return_from_tour_button_clicked():
 root = tk.Tk()
 root.title("RTG Management System")
 
-add_rtg_label = tk.Label(root, text="Add RTG:")
+title_label = tk.Label(root, text="RTG Management System", font=("TkDefaultFont", 18, "bold"))
+title_label.pack(pady=10)
+
+# Add empty space
+empty_label1 = tk.Label(root, text="", font=("TkDefaultFont", 14))
+empty_label1.pack()
+
+add_rtg_label = tk.Label(root, text="Add RTG", font=("TkDefaultFont", 16, "bold"))
 add_rtg_label.pack()
 
 add_rtg_entry = tk.Entry(root)
 add_rtg_entry.pack()
 
-add_rtg_button = tk.Button(root, text="Add RTG", command=add_rtg_button_clicked)
+add_rtg_button = tk.Button(root, text="Add RTG", font=("TkDefaultFont", 14), command=add_rtg_button_clicked)
 add_rtg_button.pack()
 
-send_on_tour_label = tk.Label(root, text="Send RTG on Tour:")
+# Add empty space
+empty_label2 = tk.Label(root, text="", font=("TkDefaultFont", 14))
+empty_label2.pack()
+
+send_on_tour_label = tk.Label(root, text="Send RTG on Tour", font=("TkDefaultFont", 16, "bold"))
 send_on_tour_label.pack()
 
 send_on_tour_entry = tk.Entry(root)
 send_on_tour_entry.pack()
 
-send_on_tour_button = tk.Button(root, text="Send On Tour", command=send_on_tour_button_clicked)
+send_on_tour_button = tk.Button(root, text="Send On Tour", font=("TkDefaultFont", 14), command=send_on_tour_button_clicked)
 send_on_tour_button.pack()
 
-return_from_tour_label = tk.Label(root, text="Return RTG from Tour:")
+# Add empty space
+empty_label3 = tk.Label(root, text="", font=("TkDefaultFont", 14))
+empty_label3.pack()
+
+return_from_tour_label = tk.Label(root, text="Return RTG from Tour", font=("TkDefaultFont", 16, "bold"))
 return_from_tour_label.pack()
 
 return_from_tour_entry = tk.Entry(root)
 return_from_tour_entry.pack()
 
-return_from_tour_button = tk.Button(root, text="Return From Tour", command=return_from_tour_button_clicked)
+return_from_tour_button = tk.Button(root, text="Return From Tour", font=("TkDefaultFont", 14), command=return_from_tour_button_clicked)
 return_from_tour_button.pack()
+
+# Add empty space
+empty_label4 = tk.Label(root, text="", font=("TkDefaultFont", 14))
+empty_label4.pack()
 
 queue_label = tk.Label(root, text="")
 queue_label.pack()
