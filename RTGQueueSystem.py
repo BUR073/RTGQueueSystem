@@ -2,7 +2,8 @@ import tkinter as tk
 from tabulate import tabulate
 
 onTour = []
-tout = ["HEB", "ABC", "EFG", "GHI", "GHF", "IUY", "YRT", "NMB"]
+# Tout queue already full to make testing easier, same with timeOut queue
+tout = ["HEB", "ABC", "EFG", "GHI", "GHF", "IUY", "YRT", "NMB"] 
 timeOut = ["YUT"]
 
 def addRTG(name):
