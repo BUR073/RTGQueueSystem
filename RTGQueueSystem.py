@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
-# Separate queues for 'Steps' and 'Bridge' RTG stations
 queue_data = {
     'Steps': {
         'tout': ["HEB", "FGH", "IOU", "OIU", "BVC", "TRE", "CXZ", "GHF"],
