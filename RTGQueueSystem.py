@@ -7,16 +7,20 @@ queue_data = {
     'Steps': {
         'tout': ["HEB", "FGH", "IOU", "OIU", "BVC", "TRE", "CXZ", "GHF"],
         'timeOut': ["MMM"],
-        'onTour': []
+        'onTour': [],
     },
     'Bridge': {
         'tout': [],
         'timeOut': [],
-        'onTour': []
+        'onTour': [],
     }
 }
 
 selected_station = 'Steps'  # Default selected station
+
+def isOnShift(name):
+    return name in queue_data[selected_station]['tout'] or name in queue_data[selected_station]['timeOut'] or name in queue_data[selected_station]['onTour']
+
 def alert(message):
     messagebox.showinfo("Alert", message)
 
@@ -69,49 +73,67 @@ def station_radio_selected():
     displayQueue()
 
 def addRTG(name):
+    if isOnShift(name):
+        alert("RTG is already on shift")
+        return
+    
     if len(queue_data[selected_station]['tout']) < 8:
         queue_data[selected_station]['tout'].append(name)
     else:
         queue_data[selected_station]['timeOut'].append(name)
 
+
 def sendOnTour(name):
-    found = False
+    if isOnShift(name):
+        found = False
 
-    if name in queue_data[selected_station]['tout']:
-        queue_data[selected_station]['tout'].remove(name)
-        found = True
+        if name in queue_data[selected_station]['tout']:
+            queue_data[selected_station]['tout'].remove(name)
+            found = True
 
-    elif name in queue_data[selected_station]['timeOut']:
-        queue_data[selected_station]['timeOut'].remove(name)
-        found = True
+        elif name in queue_data[selected_station]['timeOut']:
+            queue_data[selected_station]['timeOut'].remove(name)
+            found = True
 
-    elif name in queue_data[selected_station]['onTour']:
-        alert("RTG is already on tour")
+        elif name in queue_data[selected_station]['onTour']:
+            alert("RTG is already on tour")
+
+        if found:
+            queue_data[selected_station]['onTour'].append(str(name))
+
+        if queue_data[selected_station]['timeOut']:
+            queue_data[selected_station]['tout'].append(queue_data[selected_station]['timeOut'][0])
+            del queue_data[selected_station]['timeOut'][0]
     
     else:
-        alert("RTG not found")
+        alert("RTG is not on shift or code is not found")
+        return
 
-    if found:
-        queue_data[selected_station]['onTour'].append(str(name))
 
-    if queue_data[selected_station]['timeOut']:
-        queue_data[selected_station]['tout'].append(queue_data[selected_station]['timeOut'][0])
-        del queue_data[selected_station]['timeOut'][0]
 
 
 def returnFromTour(name):
-    if name in queue_data[selected_station]['onTour']:
-        queue_data[selected_station]['onTour'].remove(name)
-        addRTG(name)
+    if isOnShift(name):
+        if name in queue_data[selected_station]['onTour']:
+            queue_data[selected_station]['onTour'].remove(name)
+            addRTG(name)
+        else:
+            alert("RTG is not on tour")
     else:
-        alert("RTG is not on tour")
+        alert("RTG is not on shift or code is not found")
 
 def removeRTG(name):
-    for key in queue_data[selected_station]:
-        if name in queue_data[selected_station][key]:
-            queue_data[selected_station][key].remove(name)
-            alert((name + " has been removed"))
-            break
+    if isOnShift(name):
+        if name in queue_data[selected_station]['tout']:
+            queue_data[selected_station]['tout'].remove(name)
+
+        elif name in queue_data[selected_station]['timeOut']:
+            queue_data[selected_station]['timeOut'].remove(name)
+
+        elif name in queue_data[selected_station]['onTour']:
+            alert("RTG is on tour and cannot be removed")
+    else:
+        alert("RTG is not on shift or code is not found")
 
 root = tk.Tk()
 root.title("RTG Management System")
