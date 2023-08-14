@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 
 # Separate queues for 'Steps' and 'Bridge' RTG stations
 queue_data = {
@@ -16,18 +17,23 @@ queue_data = {
 }
 
 selected_station = 'Steps'  # Default selected station
+def alert(message):
+    messagebox.showinfo("Alert", message)
 
 def displayQueue():
     queue_tree.delete(*queue_tree.get_children())  # Clear previous data
 
     for num, i in enumerate(queue_data[selected_station]['tout'], start=1):
-        queue_tree.insert("", "end", values=(num, i, "Touting"))
+        if num == 1:
+            queue_tree.insert("", "end", values=("Next on tour", i, "Touting"))
+        else:
+            queue_tree.insert("", "end", values=(num-1, i, "Touting"))
 
     for num, i in enumerate(queue_data[selected_station]['timeOut'], start=len(queue_data[selected_station]['tout']) + 1):
         queue_tree.insert("", "end", values=(num, i, "Timeout"))
 
     for num, i in enumerate(queue_data[selected_station]['onTour'], start=len(queue_data[selected_station]['tout']) + len(queue_data[selected_station]['timeOut']) + 1):
-        queue_tree.insert("", "end", values=(num, i[0], "On Tour"))
+        queue_tree.insert("", "end", values=(num, i, "On Tour"))
 
 def add_rtg_button_clicked():
     name = add_rtg_entry.get().strip()
@@ -69,26 +75,50 @@ def addRTG(name):
         queue_data[selected_station]['timeOut'].append(name)
 
 def sendOnTour(name):
+    found = False
+
     if name in queue_data[selected_station]['tout']:
         queue_data[selected_station]['tout'].remove(name)
-    else:
+        found = True
+
+    elif name in queue_data[selected_station]['timeOut']:
         queue_data[selected_station]['timeOut'].remove(name)
-    queue_data[selected_station]['onTour'].append((name, 'On Tour'))
+        found = True
+
+    elif name in queue_data[selected_station]['onTour']:
+        alert("RTG is already on tour")
+    
+    else:
+        alert("RTG not found")
+
+    if found:
+        queue_data[selected_station]['onTour'].append(str(name))
+
+    if queue_data[selected_station]['timeOut']:
+        queue_data[selected_station]['tout'].append(queue_data[selected_station]['timeOut'][0])
+        del queue_data[selected_station]['timeOut'][0]
+
 
 def returnFromTour(name):
-    for item in queue_data[selected_station]['onTour']:
-        if item[0] == name:
-            queue_data[selected_station]['onTour'].remove(item)
-            if len(queue_data[selected_station]['tout']) < 8:
-                queue_data[selected_station]['tout'].append(name)
-            else:
-                queue_data[selected_station]['timeOut'].append(name)
-            break
+    if name in queue_data[selected_station]['onTour']:
+        queue_data[selected_station]['onTour'].remove(name)
+        addRTG(name)
+    else:
+        alert("RTG is not on tour")
+    # for item in queue_data[selected_station]['onTour']:
+    #     if item[0] == name:
+    #         queue_data[selected_station]['onTour'].remove(item)
+    #         if len(queue_data[selected_station]['tout']) < 8:
+    #             queue_data[selected_station]['tout'].append(name)
+    #         else:
+    #             queue_data[selected_station]['timeOut'].append(name)
+    #         break
 
 def removeRTG(name):
     for key in queue_data[selected_station]:
         if name in queue_data[selected_station][key]:
             queue_data[selected_station][key].remove(name)
+            alert((name + " has been removed"))
             break
 
 root = tk.Tk()
@@ -167,18 +197,25 @@ queue_tree_frame.grid(row=4, column=0, columnspan=4, padx=10, pady=(0, 20))
 
 queue_tree = ttk.Treeview(queue_tree_frame, columns=("No.", "Name", "Status"), show="headings", height=10)
 queue_tree.heading("No.", text="No.")
-queue_tree.heading("Name", text="Name")
+queue_tree.heading("Name", text="RTG Code")
 queue_tree.heading("Status", text="Status")
 queue_tree.pack()
 
+def center_window(window, width, height):
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    x = (screen_width - width) // 2
+    y = (screen_height - height) // 2
+
+    window.geometry(f"{width}x{height}+{x}+{y}")
+
+# Center the main application window
+center_window(root, 650, 550)
 
 
 # Display the initial queues
 displayQueue()  # Initial display
 
 root.mainloop()
-
-
-
-
 
