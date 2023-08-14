@@ -8,14 +8,16 @@ class RTGManagementSystem:
         self.root.title("RTG Management System")
         self.queue_data = {
             'Steps': {
-                'tout': ["HEB", "FGH", "IOU", "OIU", "BVC", "TRE", "CXZ", "GHF"],
-                'timeOut': ["MMM"],
-                'onTour': []
+                'tout': [],
+                'timeOut': [],
+                'onTour': [],
+                'onShift': [],
             },
             'Bridge': {
                 'tout': [],
                 'timeOut': [],
-                'onTour': []
+                'onTour': [],
+                'onShift': [],
             }
         }
         self.selected_station = 'Steps'
@@ -30,14 +32,16 @@ class RTGManagementSystem:
         self.add_rtg_frame = tk.Frame(self.root, bd=2, relief="solid", padx=10, pady=10)
         self.add_rtg_frame.grid(row=1, column=0, columnspan=2, padx=10)
 
+        self.remove_rtg_frame = tk.Frame(self.root, bd=2, relief="solid", padx=10, pady=10)
+        self.remove_rtg_frame.grid(row=2, column=0, columnspan=2, padx=10)
+
         self.send_on_tour_frame = tk.Frame(self.root, bd=2, relief="solid", padx=10, pady=10)
         self.send_on_tour_frame.grid(row=1, column=2, columnspan=2, padx=10)
 
         self.return_from_tour_frame = tk.Frame(self.root, bd=2, relief="solid", padx=10, pady=10)
-        self.return_from_tour_frame.grid(row=2, column=0, columnspan=2, padx=10)
+        self.return_from_tour_frame.grid(row=2, column=2, columnspan=2, padx=10)
 
-        self.remove_rtg_frame = tk.Frame(self.root, bd=2, relief="solid", padx=10, pady=10)
-        self.remove_rtg_frame.grid(row=2, column=2, columnspan=2, padx=10)
+
 
         # Add RTG section
         add_rtg_label = tk.Label(self.add_rtg_frame, text="Add RTG", font=("TkDefaultFont", 16, "bold"))
@@ -48,6 +52,16 @@ class RTGManagementSystem:
 
         add_rtg_button = tk.Button(self.add_rtg_frame, text="Add RTG", font=("TkDefaultFont", 14), command=self.add_rtg_button_clicked)
         add_rtg_button.pack()
+
+        # Remove RTG section
+        remove_rtg_label = tk.Label(self.remove_rtg_frame, text="Remove RTG", font=("TkDefaultFont", 16, "bold"))
+        remove_rtg_label.pack()
+
+        self.remove_rtg_entry = tk.Entry(self.remove_rtg_frame)
+        self.remove_rtg_entry.pack()
+
+        remove_rtg_button = tk.Button(self.remove_rtg_frame, text="Remove RTG", font=("TkDefaultFont", 14), command=self.remove_rtg_button_clicked)
+        remove_rtg_button.pack()
 
         # Send on Tour section
         send_on_tour_label = tk.Label(self.send_on_tour_frame, text="Send RTG on Tour", font=("TkDefaultFont", 16, "bold"))
@@ -68,16 +82,6 @@ class RTGManagementSystem:
 
         return_from_tour_button = tk.Button(self.return_from_tour_frame, text="Return From Tour", font=("TkDefaultFont", 14), command=self.return_from_tour_button_clicked)
         return_from_tour_button.pack()
-
-        # Remove RTG section
-        remove_rtg_label = tk.Label(self.remove_rtg_frame, text="Remove RTG", font=("TkDefaultFont", 16, "bold"))
-        remove_rtg_label.pack()
-
-        self.remove_rtg_entry = tk.Entry(self.remove_rtg_frame)
-        self.remove_rtg_entry.pack()
-
-        remove_rtg_button = tk.Button(self.remove_rtg_frame, text="Remove RTG", font=("TkDefaultFont", 14), command=self.remove_rtg_button_clicked)
-        remove_rtg_button.pack()
 
         # Radio buttons for station selection
         station_frame = tk.Frame(self.root)
@@ -155,48 +159,77 @@ class RTGManagementSystem:
         self.selected_station = self.station_var.get()
         self.display_queue()
 
+    def isOnShift(self, name):
+        return name in self.queue_data[self.selected_station]['onShift']
+            
     def addRTG(self, name):
-        if len(self.queue_data[self.selected_station]['tout']) < 8:
-            self.queue_data[self.selected_station]['tout'].append(name)
+        if self.isOnShift(name):
+            self.alert("RTG is already on shift")
         else:
-            self.queue_data[self.selected_station]['timeOut'].append(name)
+            if len(self.queue_data[self.selected_station]['tout']) < 8:
+                self.queue_data[self.selected_station]['tout'].append(name)
+            else:
+                self.queue_data[self.selected_station]['timeOut'].append(name)
+            self.queue_data[self.selected_station]['onShift'].append(name)
+        
 
     def sendOnTour(self, name):
-        found = False
+        if self.isOnShift(name):
+            found = False
 
-        if name in self.queue_data[self.selected_station]['tout']:
-            self.queue_data[self.selected_station]['tout'].remove(name)
-            found = True
+            if name in self.queue_data[self.selected_station]['tout']:
+                self.queue_data[self.selected_station]['tout'].remove(name)
+                found = True
 
-        elif name in self.queue_data[self.selected_station]['timeOut']:
-            self.queue_data[self.selected_station]['timeOut'].remove(name)
-            found = True
+            elif name in self.queue_data[self.selected_station]['timeOut']:
+                self.queue_data[self.selected_station]['timeOut'].remove(name)
+                found = True
 
-        elif name in self.queue_data[self.selected_station]['onTour']:
-            self.alert("RTG is already on tour")
+            elif name in self.queue_data[self.selected_station]['onTour']:
+                self.alert("RTG is already on tour")
+            else:
+                self.alert("RTG not found")
+
+            if found:
+                self.queue_data[self.selected_station]['onTour'].append(str(name))
+
+            if self.queue_data[self.selected_station]['timeOut']:
+                self.queue_data[self.selected_station]['tout'].append(self.queue_data[self.selected_station]['timeOut'][0])
+                del self.queue_data[self.selected_station]['timeOut'][0]
         else:
-            self.alert("RTG not found")
-
-        if found:
-            self.queue_data[self.selected_station]['onTour'].append(str(name))
-
-        if self.queue_data[self.selected_station]['timeOut']:
-            self.queue_data[self.selected_station]['tout'].append(self.queue_data[self.selected_station]['timeOut'][0])
-            del self.queue_data[self.selected_station]['timeOut'][0]
+            self.alert("RTG code is not valid or RTG is not currently on shift")
 
     def returnFromTour(self, name):
-        if name in self.queue_data[self.selected_station]['onTour']:
-            self.queue_data[self.selected_station]['onTour'].remove(name)
-            self.addRTG(name)
+        if self.isOnShift(name):
+            if name in self.queue_data[self.selected_station]['onTour']:
+                self.queue_data[self.selected_station]['onTour'].remove(name)
+                self.addRTG(name)
+            else:
+                self.alert("RTG is not on tour")
         else:
-            self.alert("RTG is not on tour")
+            self.alert("RTG code is not valid")
 
     def removeRTG(self, name):
-        for key in self.queue_data[self.selected_station]:
-            if name in self.queue_data[self.selected_station][key]:
-                self.queue_data[self.selected_station][key].remove(name)
-                self.alert(name + " has been removed")
-                break
+        # if self.isOnShift(name):
+        #     for key in self.queue_data[self.selected_station]:
+        #         if name in self.queue_data[self.selected_station][key]:
+        #             self.queue_data[self.selected_station][key].remove(name)
+        #             self.alert(name + " has been removed")
+        #             break
+        if self.isOnShift(name):
+            if name in self.queue_data[self.selected_station]['onTour']:
+                self.alert("You cannot remove and RTG that is on tour")
+            elif name in self.queue_data[self.selected_station]['tout']:
+                self.queue_data[self.selected_station]['tout'].remove(name)
+                self.queue_data[self.selected_station]['onShift'].remove(name)
+                self.alert("RTG has been removed")
+            else:
+                self.queue_data[self.selected_station]['timeOut'].remove(name)
+                self.queue_data[self.selected_station]['onShift'].remove(name)
+                self.alert("RTG has been removed")
+        else:
+            self.alert("RTG code is not recognized or is not currently on shift")
+
 
     def alert(self, message):
         messagebox.showinfo("Alert", message)
