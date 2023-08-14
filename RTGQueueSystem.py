@@ -1,13 +1,32 @@
+import tkinter as tk
+from tkinter import ttk
+
+# Separate queues for 'Steps' and 'Bridge' RTG stations
+queue_data = {
+    'Steps': {
+        'tout': [],
+        'timeOut': [],
+        'onTour': []
+    },
+    'Bridge': {
+        'tout': [],
+        'timeOut': [],
+        'onTour': []
+    }
+}
+
+selected_station = 'Steps'  # Default selected station
+
 def displayQueue():
     queue_tree.delete(*queue_tree.get_children())  # Clear previous data
 
-    for num, i in enumerate(tout, start=1):
+    for num, i in enumerate(queue_data[selected_station]['tout'], start=1):
         queue_tree.insert("", "end", values=(num, i, "Touting"))
 
-    for num, i in enumerate(timeOut, start=len(tout) + 1):
+    for num, i in enumerate(queue_data[selected_station]['timeOut'], start=len(queue_data[selected_station]['tout']) + 1):
         queue_tree.insert("", "end", values=(num, i, "Timeout"))
 
-    for num, i in enumerate(onTour, start=len(tout) + len(timeOut) + 1):
+    for num, i in enumerate(queue_data[selected_station]['onTour'], start=len(queue_data[selected_station]['tout']) + len(queue_data[selected_station]['timeOut']) + 1):
         queue_tree.insert("", "end", values=(num, i[0], "On Tour"))
 
 def add_rtg_button_clicked():
@@ -37,6 +56,31 @@ def remove_rtg_button_clicked():
         removeRTG(name)
         remove_rtg_entry.delete(0, "end")
         displayQueue()
+
+def station_radio_selected():
+    global selected_station
+    selected_station = station_var.get()
+    displayQueue()
+
+def addRTG(name):
+    queue_data[selected_station]['tout'].append(name)
+
+def sendOnTour(name):
+    queue_data[selected_station]['tout'].remove(name)
+    queue_data[selected_station]['onTour'].append((name, 'On Tour'))
+
+def returnFromTour(name):
+    for item in queue_data[selected_station]['onTour']:
+        if item[0] == name:
+            queue_data[selected_station]['onTour'].remove(item)
+            queue_data[selected_station]['timeOut'].append(name)
+            break
+
+def removeRTG(name):
+    for key in queue_data[selected_station]:
+        if name in queue_data[selected_station][key]:
+            queue_data[selected_station][key].remove(name)
+            break
 
 root = tk.Tk()
 root.title("RTG Management System")
@@ -98,9 +142,19 @@ remove_rtg_entry.pack()
 remove_rtg_button = tk.Button(remove_rtg_frame, text="Remove RTG", font=("TkDefaultFont", 14), command=remove_rtg_button_clicked)
 remove_rtg_button.pack()
 
+# Radio buttons for station selection
+station_frame = tk.Frame(root)
+station_frame.grid(row=3, column=0, columnspan=4, pady=(0, 10))
+
+station_var = tk.StringVar()
+steps_radio = tk.Radiobutton(station_frame, text="Steps", variable=station_var, value="Steps", command=station_radio_selected)
+bridge_radio = tk.Radiobutton(station_frame, text="Bridge", variable=station_var, value="Bridge", command=station_radio_selected)
+steps_radio.pack(side="left", padx=10)
+bridge_radio.pack(side="left", padx=10)
+
 # Queue display
 queue_tree_frame = tk.Frame(root, bd=2, relief="solid", padx=10, pady=10)
-queue_tree_frame.grid(row=3, column=0, columnspan=4, padx=10, pady=(0, 20))  # Added pady
+queue_tree_frame.grid(row=4, column=0, columnspan=4, padx=10, pady=(0, 20))
 
 queue_tree = ttk.Treeview(queue_tree_frame, columns=("No.", "Name", "Status"), show="headings", height=10)
 queue_tree.heading("No.", text="No.")
@@ -108,6 +162,12 @@ queue_tree.heading("Name", text="Name")
 queue_tree.heading("Status", text="Status")
 queue_tree.pack()
 
+
+
+# Display the initial queues
 displayQueue()  # Initial display
 
 root.mainloop()
+
+
+
