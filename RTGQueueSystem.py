@@ -210,12 +210,6 @@ class RTGManagementSystem:
             self.alert("RTG code is not valid")
 
     def removeRTG(self, name):
-        # if self.isOnShift(name):
-        #     for key in self.queue_data[self.selected_station]:
-        #         if name in self.queue_data[self.selected_station][key]:
-        #             self.queue_data[self.selected_station][key].remove(name)
-        #             self.alert(name + " has been removed")
-        #             break
         if self.isOnShift(name):
             if name in self.queue_data[self.selected_station]['onTour']:
                 self.alert("You cannot remove and RTG that is on tour")
