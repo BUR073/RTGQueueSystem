@@ -4,8 +4,8 @@ from tkinter import ttk
 # Separate queues for 'Steps' and 'Bridge' RTG stations
 queue_data = {
     'Steps': {
-        'tout': [],
-        'timeOut': [],
+        'tout': ["HEB", "FGH", "IOU", "OIU", "BVC", "TRE", "CXZ", "GHF"],
+        'timeOut': ["MMM"],
         'onTour': []
     },
     'Bridge': {
@@ -63,17 +63,26 @@ def station_radio_selected():
     displayQueue()
 
 def addRTG(name):
-    queue_data[selected_station]['tout'].append(name)
+    if len(queue_data[selected_station]['tout']) < 8:
+        queue_data[selected_station]['tout'].append(name)
+    else:
+        queue_data[selected_station]['timeOut'].append(name)
 
 def sendOnTour(name):
-    queue_data[selected_station]['tout'].remove(name)
+    if name in queue_data[selected_station]['tout']:
+        queue_data[selected_station]['tout'].remove(name)
+    else:
+        queue_data[selected_station]['timeOut'].remove(name)
     queue_data[selected_station]['onTour'].append((name, 'On Tour'))
 
 def returnFromTour(name):
     for item in queue_data[selected_station]['onTour']:
         if item[0] == name:
             queue_data[selected_station]['onTour'].remove(item)
-            queue_data[selected_station]['timeOut'].append(name)
+            if len(queue_data[selected_station]['tout']) < 8:
+                queue_data[selected_station]['tout'].append(name)
+            else:
+                queue_data[selected_station]['timeOut'].append(name)
             break
 
 def removeRTG(name):
@@ -90,7 +99,7 @@ title_label = tk.Label(root, text="RTG Management System", font=("TkDefaultFont"
 title_label.grid(row=0, column=0, columnspan=4, pady=10)
 
 # Create frames for each section
-add_rtg_frame = tk.Frame(root, bd=2, relief="solid", padx=10, pady=10)
+add_rtg_frame = tk.Frame(root , bd=2, relief="solid", padx=10, pady=10)
 add_rtg_frame.grid(row=1, column=0, columnspan=2, padx=10)
 
 send_on_tour_frame = tk.Frame(root, bd=2, relief="solid", padx=10, pady=10)
@@ -168,6 +177,8 @@ queue_tree.pack()
 displayQueue()  # Initial display
 
 root.mainloop()
+
+
 
 
 
