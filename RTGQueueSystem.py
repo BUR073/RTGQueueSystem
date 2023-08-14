@@ -24,12 +24,13 @@ def isOnShift(name):
 def alert(message):
     messagebox.showinfo("Alert", message)
 
+
 def displayQueue():
     queue_tree.delete(*queue_tree.get_children())  # Clear previous data
 
     for num, i in enumerate(queue_data[selected_station]['tout'], start=1):
         if num == 1:
-            queue_tree.insert("", "end", values=("Next on tour", i, "Touting"))
+            queue_tree.insert("", "end", values=(num, i, "Touting"))
         else:
             queue_tree.insert("", "end", values=(num-1, i, "Touting"))
 
@@ -72,7 +73,11 @@ def station_radio_selected():
     selected_station = station_var.get()
     displayQueue()
 
+def format(name):
+    return name.upper().strip()
+
 def addRTG(name):
+    name = format(name)
     if isOnShift(name):
         alert("RTG is already on shift")
         return
@@ -84,6 +89,7 @@ def addRTG(name):
 
 
 def sendOnTour(name):
+    name = format(name)
     if isOnShift(name):
         found = False
 
@@ -109,10 +115,8 @@ def sendOnTour(name):
         alert("RTG is not on shift or code is not found")
         return
 
-
-
-
 def returnFromTour(name):
+    name = format(name)
     if isOnShift(name):
         if name in queue_data[selected_station]['onTour']:
             queue_data[selected_station]['onTour'].remove(name)
@@ -123,6 +127,7 @@ def returnFromTour(name):
         alert("RTG is not on shift or code is not found")
 
 def removeRTG(name):
+    name = format(name)
     if isOnShift(name):
         if name in queue_data[selected_station]['tout']:
             queue_data[selected_station]['tout'].remove(name)
