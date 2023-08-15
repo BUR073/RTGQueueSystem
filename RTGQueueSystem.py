@@ -1,7 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+import customtkinter
 
+customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
+customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
+
+
+# Separate queues for 'Steps' and 'Bridge' RTG stations
 queue_data = {
     'Steps': {
         'tout': ["HEB", "FGH", "IOU", "OIU", "BVC", "TRE", "CXZ", "GHF"],
@@ -9,7 +15,7 @@ queue_data = {
         'onTour': [],
     },
     'Bridge': {
-        'tout': [],
+        'tout': [], 
         'timeOut': [],
         'onTour': [],
     }
@@ -139,79 +145,80 @@ def removeRTG(name):
     else:
         alert("RTG is not on shift or code is not found")
 
-root = tk.Tk()
+root = customtkinter.CTk()
 root.title("RTG Management System")
 
 # Centered title
-title_label = tk.Label(root, text="RTG Management System", font=("TkDefaultFont", 18, "bold"))
+title_label = customtkinter.CTkLabel(root, text="RTG Management System", font=("TkDefaultFont", 18, "bold"))
 title_label.grid(row=0, column=0, columnspan=4, pady=10)
 
 # Create frames for each section
-add_rtg_frame = tk.Frame(root, bd=2, relief="solid", padx=10, pady=10)
-add_rtg_frame.grid(row=1, column=0, columnspan=2, padx=10)
+add_rtg_frame = customtkinter.CTkFrame(master=root, fg_color="transparent")
+add_rtg_frame.grid(row=1, column=0, columnspan=2, pady=(10, 10))
 
-send_on_tour_frame = tk.Frame(root, bd=2, relief="solid", padx=10, pady=10)
-send_on_tour_frame.grid(row=1, column=2, columnspan=2, padx=10)
+send_on_tour_frame = customtkinter.CTkFrame(master=root, fg_color="transparent")
+send_on_tour_frame.grid(row=1, column=2, columnspan=2, pady=(10, 10))
 
 # Return from Tour section (Position swapped)
-return_from_tour_frame = tk.Frame(root, bd=2, relief="solid", padx=10, pady=10)
-return_from_tour_frame.grid(row=2, column=2, columnspan=2, padx=10)
+return_from_tour_frame = customtkinter.CTkFrame(master=root, fg_color="transparent")
+return_from_tour_frame.grid(row=2, column=2, columnspan=2, pady=(10, 10))
 
-remove_rtg_frame = tk.Frame(root, bd=2, relief="solid", padx=10, pady=10)
-remove_rtg_frame.grid(row=2, column=0, columnspan=2, padx=10)
+remove_rtg_frame = customtkinter.CTkFrame(master=root, fg_color="transparent")
+remove_rtg_frame.grid(row=2, column=0, columnspan=2, pady=(10, 10))
 
 # Add RTG section
-add_rtg_label = tk.Label(add_rtg_frame, text="Add RTG", font=("TkDefaultFont", 16, "bold"))
+add_rtg_label = customtkinter.CTkLabel(add_rtg_frame, text="Add RTG", font=("TkDefaultFont", 16, "bold"), fg_color="transparent")
 add_rtg_label.pack()
 
-add_rtg_entry = tk.Entry(add_rtg_frame)
+add_rtg_entry = customtkinter.CTkEntry(add_rtg_frame, width=140, height=25, fg_color="transparent")
 add_rtg_entry.pack()
 
-add_rtg_button = tk.Button(add_rtg_frame, text="Add RTG", font=("TkDefaultFont", 14), command=add_rtg_button_clicked)
+add_rtg_button = customtkinter.CTkButton(add_rtg_frame, text="Add RTG", font=("TkDefaultFont", 14), command=add_rtg_button_clicked)
+
 add_rtg_button.pack()
 
 # Send on Tour section
-send_on_tour_label = tk.Label(send_on_tour_frame, text="Send RTG on Tour", font=("TkDefaultFont", 16, "bold"))
+send_on_tour_label = customtkinter.CTkLabel(send_on_tour_frame, text="Send RTG on Tour", font=("TkDefaultFont", 16, "bold"), fg_color="transparent")
 send_on_tour_label.pack()
 
-send_on_tour_entry = tk.Entry(send_on_tour_frame)
+send_on_tour_entry = customtkinter.CTkEntry(send_on_tour_frame, width=140, height=25, fg_color="transparent")
 send_on_tour_entry.pack()
 
-send_on_tour_button = tk.Button(send_on_tour_frame, text="Send On Tour", font=("TkDefaultFont", 14), command=send_on_tour_button_clicked)
+send_on_tour_button = customtkinter.CTkButton(send_on_tour_frame, text="Send On Tour", font=("TkDefaultFont", 14), command=send_on_tour_button_clicked)
 send_on_tour_button.pack()
 
 # Return from Tour section
-return_from_tour_label = tk.Label(return_from_tour_frame, text="Return RTG from Tour", font=("TkDefaultFont", 16, "bold"))
+return_from_tour_label = customtkinter.CTkLabel(return_from_tour_frame, text="Return RTG from Tour", font=("TkDefaultFont", 16, "bold"), width=140, fg_color="transparent")
 return_from_tour_label.pack()
 
-return_from_tour_entry = tk.Entry(return_from_tour_frame)
+return_from_tour_entry = customtkinter.CTkEntry(return_from_tour_frame, width=140, height=25, fg_color="transparent")
 return_from_tour_entry.pack()
 
-return_from_tour_button = tk.Button(return_from_tour_frame, text="Return From Tour", font=("TkDefaultFont", 14), command=return_from_tour_button_clicked)
+return_from_tour_button = customtkinter.CTkButton(return_from_tour_frame, text="Return From Tour", font=("TkDefaultFont", 14), command=return_from_tour_button_clicked)
 return_from_tour_button.pack()
 
 # Remove RTG section
-remove_rtg_label = tk.Label(remove_rtg_frame, text="Remove RTG", font=("TkDefaultFont", 16, "bold"))
+remove_rtg_label = customtkinter.CTkLabel(remove_rtg_frame, text="Remove RTG", font=("TkDefaultFont", 16, "bold"), width=140, fg_color="transparent")
 remove_rtg_label.pack()
 
-remove_rtg_entry = tk.Entry(remove_rtg_frame)
+remove_rtg_entry = customtkinter.CTkEntry(remove_rtg_frame, width=140, height=25, fg_color="transparent")
 remove_rtg_entry.pack()
 
-remove_rtg_button = tk.Button(remove_rtg_frame, text="Remove RTG", font=("TkDefaultFont", 14), command=remove_rtg_button_clicked)
+remove_rtg_button = customtkinter.CTkButton(remove_rtg_frame, text="Remove RTG", font=("TkDefaultFont", 14), command=remove_rtg_button_clicked)
 remove_rtg_button.pack()
 
 # Radio buttons for station selection
-station_frame = tk.Frame(root)
-station_frame.grid(row=3, column=0, columnspan=4, pady=(0, 10))
+station_frame = customtkinter.CTkFrame(master=root, fg_color="transparent")
+station_frame.grid(row=3, column=0, columnspan=4, pady=(10, 10))
 
 station_var = tk.StringVar()
-steps_radio = tk.Radiobutton(station_frame, text="Steps", variable=station_var, value="Steps", command=station_radio_selected)
-bridge_radio = tk.Radiobutton(station_frame, text="Bridge", variable=station_var, value="Bridge", command=station_radio_selected)
+steps_radio = customtkinter.CTkRadioButton(station_frame, text="Steps", variable=station_var, value="Steps", command=station_radio_selected, hover=True)
+bridge_radio = customtkinter.CTkRadioButton(station_frame, text="Bridge", variable=station_var, value="Bridge", command=station_radio_selected, hover=True)
 steps_radio.pack(side="left", padx=10)
 bridge_radio.pack(side="left", padx=10)
 
 # Queue display
-queue_tree_frame = tk.Frame(root, bd=2, relief="solid", padx=10, pady=10)
+queue_tree_frame = customtkinter.CTkFrame(master=root)
 queue_tree_frame.grid(row=4, column=0, columnspan=4, padx=10, pady=(0, 20))
 
 queue_tree = ttk.Treeview(queue_tree_frame, columns=("No.", "Name", "Status"), show="headings", height=10)
