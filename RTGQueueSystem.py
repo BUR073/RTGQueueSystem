@@ -4,7 +4,7 @@ from tkinter import messagebox
 import customtkinter
 
 customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
-customtkinter.set_default_color_theme("blue")  # Themes: blue (default), dark-blue, green
+customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
 
 
 # Separate queues for 'Steps' and 'Bridge' RTG stations
@@ -23,36 +23,31 @@ queue_data = {
 
 selected_station = 'Steps'  # Default selected station
 
-def isOnShift(name): # Check if name is alreay in tout, timeOut or onTour
+def isOnShift(name):
     return name in queue_data[selected_station]['tout'] or name in queue_data[selected_station]['timeOut'] or name in queue_data[selected_station]['onTour']
 
-def alert(message): # Create alert box containing message
+def alert(message):
     messagebox.showinfo("Alert", message)
 
 
 def displayQueue():
     queue_tree.delete(*queue_tree.get_children())  # Clear previous data
 
-    for num, i in enumerate(queue_data[selected_station]['tout'], start=1): # Loop through tout list of selected station
-        if num == 1: # If num equals 1 print next on tour rather than 1
-            queue_tree.insert("", "end", values=("Next on tour", i, "Touting"))
-        else: # Else just print the number
-            queue_tree.insert("", "end", values=(num-1, i, "Touting"))
+    for num, i in enumerate(queue_data[selected_station]['tout'], start=1):
+        queue_tree.insert("", "end", values=(num, i, "Touting"))
 
-    for num, i in enumerate(queue_data[selected_station]['timeOut'], start=8): 
+    for num, i in enumerate(queue_data[selected_station]['timeOut'], start=len(queue_data[selected_station]['tout']) + 1):
         queue_tree.insert("", "end", values=(num, i, "Timeout"))
-        # Loop through timeOut and print out data and position in queue starting from 8
 
-    for num, i in enumerate(queue_data[selected_station]['onTour'], start=len(queue_data[selected_station]['timeOut']) + 9):
+    for num, i in enumerate(queue_data[selected_station]['onTour'], start=len(queue_data[selected_station]['tout']) + len(queue_data[selected_station]['timeOut']) + 1):
         queue_tree.insert("", "end", values=(num, i, "On Tour"))
-        # Same as above but with onTour and 9
 
 def add_rtg_button_clicked():
-    name = add_rtg_entry.get().strip() # Get input from add_rtg_entry and strip whitespace
-    if name: # If name contains a value
-        addRTG(name) # Call fucntion addRTG and pass in name
-        add_rtg_entry.delete(0, "end") # Clear the input for add_rtg_entry
-        displayQueue() # Call function displayQueue
+    name = add_rtg_entry.get().strip()
+    if name:
+        addRTG(name)
+        add_rtg_entry.delete(0, "end")
+        displayQueue()
 
 def send_on_tour_button_clicked():
     name = send_on_tour_entry.get().strip()
@@ -76,33 +71,29 @@ def remove_rtg_button_clicked():
         displayQueue()
 
 def station_radio_selected():
-    global selected_station # Create global value selected_station
-    selected_station = station_var.get() # Get value from station_var radio button
-    displayQueue() # Call function displayQueue
+    global selected_station
+    selected_station = station_var.get()
+    displayQueue()
 
 def format(name):
-    return name.upper() # Return input in uppercase
+    return name.upper().strip()
 
 def addRTG(name):
-    name = format(name) 
-    if isOnShift(name): # If isOnShift() returns True
+    name = format(name)
+    if isOnShift(name):
         alert("RTG is already on shift")
         return
     
-    if len(queue_data[selected_station]['tout']) < 8: # If there are less than 8 RTGs touting
-        queue_data[selected_station]['tout'].append(name) # Append name to tout on the selected station
+    if len(queue_data[selected_station]['tout']) < 8:
+        queue_data[selected_station]['tout'].append(name)
     else:
-        queue_data[selected_station]['timeOut'].append(name) # Append name to timeOut
+        queue_data[selected_station]['timeOut'].append(name)
 
 
 def sendOnTour(name):
     name = format(name)
     if isOnShift(name):
         found = False
-
-        # Find name in lists, when found set found to True and remove name 
-        # Unless is found in onTour, then alert as RTG cannot be removed
-        # when on tour
 
         if name in queue_data[selected_station]['tout']:
             queue_data[selected_station]['tout'].remove(name)
@@ -116,10 +107,9 @@ def sendOnTour(name):
             alert("RTG is already on tour")
 
         if found:
-            queue_data[selected_station]['onTour'].append(name) # Add name to onTour if found in lists
+            queue_data[selected_station]['onTour'].append(str(name))
 
-        if queue_data[selected_station]['timeOut']: # If there are RTGs on timeOut
-            # Append the first name in timeOut to tout and remove them from timeOut
+        if queue_data[selected_station]['timeOut']:
             queue_data[selected_station]['tout'].append(queue_data[selected_station]['timeOut'][0])
             del queue_data[selected_station]['timeOut'][0]
     
@@ -151,6 +141,11 @@ def removeRTG(name):
             alert("RTG is on tour and cannot be removed")
     else:
         alert("RTG is not on shift or code is not found")
+
+    if len(queue_data[selected_station]['timeOut']) != 0 and len(queue_data[selected_station]['tout']) < 8:
+        print("should reformat")
+        queue_data[selected_station]['tout'].append(queue_data[selected_station]['timeOut'][0])
+        del queue_data[selected_station]['timeOut'][0]
 
 root = customtkinter.CTk()
 root.title("RTG Management System")
@@ -226,7 +221,7 @@ bridge_radio.pack(side="left", padx=10)
 
 # Queue display
 queue_tree_frame = customtkinter.CTkFrame(master=root)
-queue_tree_frame.grid(row=4, column=0, columnspan=4, padx=10, pady=(10, 10))
+queue_tree_frame.grid(row=4, column=0, columnspan=4, padx=10, pady=(0, 20))
 
 queue_tree = ttk.Treeview(queue_tree_frame, columns=("No.", "Name", "Status"), show="headings", height=10)
 queue_tree.heading("No.", text="No.")
@@ -244,7 +239,7 @@ def center_window(window, width, height):
     window.geometry(f"{width}x{height}+{x}+{y}")
 
 # Center the main application window
-center_window(root, 622, 510)
+center_window(root, 650, 550)
 
 
 # Display the initial queues
