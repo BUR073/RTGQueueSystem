@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import customtkinter
+from datetime import datetime
 
 customtkinter.set_appearance_mode("light")  # Modes: system (default), light, dark
 customtkinter.set_default_color_theme("dark-blue")  # Themes: blue (default), dark-blue, green
@@ -13,15 +14,31 @@ queue_data = {
         'tout': ["HEB", "FGH", "IOU", "OIU", "BVC", "TRE", "CXZ", "GHF"],
         'timeOut': ["MMM"],
         'onTour': [],
+        'history': [],
     },
     'Bridge': {
         'tout': [], 
         'timeOut': [],
         'onTour': [],
+        'history': [],
     }
 }
 
 selected_station = 'Steps'  # Default selected station
+
+
+def getTime():
+    return str(datetime.now().strftime("%H:%M:%S"))
+
+def updateHistory(name, action):
+    queue_data[selected_station]['history'].append(name + action + getTime())
+    printHistory()
+
+def printHistory():
+    print("History")
+    print("")
+    for i in queue_data[selected_station]['history']:
+        print(i)
 
 def isOnShift(name):
     return name in queue_data[selected_station]['tout'] or name in queue_data[selected_station]['timeOut'] or name in queue_data[selected_station]['onTour']
@@ -45,7 +62,7 @@ def displayQueue():
 def add_rtg_button_clicked():
     name = add_rtg_entry.get().strip()
     if name:
-        addRTG(name)
+        addRTG(name, True)
         add_rtg_entry.delete(0, "end")
         displayQueue()
 
@@ -78,7 +95,7 @@ def station_radio_selected():
 def format(name):
     return name.upper().strip()
 
-def addRTG(name):
+def addRTG(name, new):
     name = format(name)
     if isOnShift(name):
         alert("RTG is already on shift")
@@ -88,6 +105,11 @@ def addRTG(name):
         queue_data[selected_station]['tout'].append(name)
     else:
         queue_data[selected_station]['timeOut'].append(name)
+
+    if new:
+        updateHistory(name, " clocked in at ")
+
+    
 
 
 def sendOnTour(name):
@@ -108,6 +130,7 @@ def sendOnTour(name):
 
         if found:
             queue_data[selected_station]['onTour'].append(str(name))
+            updateHistory(name, " went on tour at ")
 
         if queue_data[selected_station]['timeOut']:
             queue_data[selected_station]['tout'].append(queue_data[selected_station]['timeOut'][0])
@@ -122,20 +145,25 @@ def returnFromTour(name):
     if isOnShift(name):
         if name in queue_data[selected_station]['onTour']:
             queue_data[selected_station]['onTour'].remove(name)
-            addRTG(name)
+            addRTG(name, False)
+            updateHistory(name, " returned from tour at ")
         else:
             alert("RTG is not on tour")
     else:
         alert("RTG is not on shift or code is not found")
+
 
 def removeRTG(name):
     name = format(name)
     if isOnShift(name):
         if name in queue_data[selected_station]['tout']:
             queue_data[selected_station]['tout'].remove(name)
+            updateHistory(name, " clocked out at ")
+
 
         elif name in queue_data[selected_station]['timeOut']:
             queue_data[selected_station]['timeOut'].remove(name)
+            updateHistory(name, " clocked out at ")
 
         elif name in queue_data[selected_station]['onTour']:
             alert("RTG is on tour and cannot be removed")
@@ -143,9 +171,9 @@ def removeRTG(name):
         alert("RTG is not on shift or code is not found")
 
     if len(queue_data[selected_station]['timeOut']) != 0 and len(queue_data[selected_station]['tout']) < 8:
-        print("should reformat")
         queue_data[selected_station]['tout'].append(queue_data[selected_station]['timeOut'][0])
         del queue_data[selected_station]['timeOut'][0]
+    
 
 root = customtkinter.CTk()
 root.title("RTG Management System")
